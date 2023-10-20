@@ -1,120 +1,77 @@
-# EXP-9 POLYNOMIAL-TREND-ESTIMATION
+# EXP 7 - ARMA IN PYTHON
 
 ## AIM:
-Implementation of Polynomial Trend Estiamtion Using Python.
+To implement ARIMA model in python.
 
 ## ALGORITHM:
-1) Import necessary libraries (NumPy, Matplotlib, Pandas, scikit-learn).
-2) Load the dataset using Pandas.
-3) Extract features (independent variable) and the target variable from the dataset.
-4) Choose the degree of the polynomial for regression.
-5) Use PolynomialFeatures to transform the features into polynomial features of the chosen degree.
-6) Fit a linear regression model to the polynomial features.
-7) Visualize the original data points and the polynomial regression curve.
-8) Optional: If needed, predict the target variable for new data points using the trained model.
-9) End the program.
+
+1. Import necessary libraries.
+2. Set up matplotlib settings for figure size.
+3. Define an ARMA(1,1) process with coefficients ar1 and ma1, and generate a sample of 1000 data points using the ArmaProcess class. Plot the generated time series and set the title and x-axis limits.
+4. Display the autocorrelation and partial autocorrelation plots for the ARMA(1,1) process using plot_acf and plot_pacf.
+5. Define an ARMA(2,2) process with coefficients ar2 and ma2, and generate a sample of 10000 data points using the ArmaProcess class. Plot the generated time series and set the title and x-axis limits.
+6. Display the autocorrelation and partial autocorrelation plots for the ARMA(2,2) process using plot_acf and plot_pacf.
+
 
 ## PROGRAM:
-### A - LINEAR TREND ESTIMATION
-python
-def calculateB(x, y, n):
- 
- # sum of array x 
-  sx = sum(x)
- # sum of array y 
-  sy = sum(y)
- 
- # for sum of product of x and y 
-  sxsy = 0
- # sum of square of x 
-  sx2 = 0
-  for i in range(n):
-      sxsy += x[i] * y[i]
-      sx2 += x[i] * x[i]
-  b = (n * sxsy - sx * sy)/(n * sx2 - sx * sx)
-  return b
-
-def leastRegLine(X,Y,n):
- 
- # Finding b 
-  b = calculateB(X, Y, n)
-  meanX = int(sum(X)/n)
-  meanY = int(sum(Y)/n)
-  # Calculating a
-  a = meanY - b * meanX
-  # Printing regression line 
-  print("Regression line:")
-  print("Y = ", '%.3f'%a, " + ", '%.3f'%b, "*X", sep="")
-  return a,b
-
-X = [95, 85, 80, 70, 60 ]
-Y = [90, 80, 70, 65, 60 ]
-n = len(X)
-a,b=leastRegLine(X, Y, n)
-
-for i in range(len(X)):
-  Y[i]=a+b*X[i]
-  print("%.3f"%Y[i])
-
-
-### B - POLYNOMIAL REGRESSION
-python
-# Importing the libraries
-import numpy as np
+```python
+from pandas import read_csv
+from pandas import datetime
+from matplotlib import pyplot
+from pandas.plotting import autocorrelation_plot
+from pandas import DataFrame
+from statsmodels.tsa.arima_model import ARIMA
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from statsmodels.tsa.arima_process import ArmaProcess
 import matplotlib.pyplot as plt
-import pandas as pd
-# Importing the dataset
-datas = pd.read_csv('data.csv')
-datas
-X = datas.iloc[:, 1:2].values
-y = datas.iloc[:, 2].values
-# Features and the target variables
-X = datas.iloc[:, 1:2].values
-y = datas.iloc[:, 2].values
-# Fitting Linear Regression to the dataset
-from sklearn.linear_model import LinearRegression
-lin = LinearRegression()
-lin.fit(X, y)
-# Fitting Polynomial Regression to the dataset
-from sklearn.preprocessing import PolynomialFeatures
-poly = PolynomialFeatures(degree=4)
-X_poly = poly.fit_transform(X)
-poly.fit(X_poly, y)
-lin2 = LinearRegression()
-lin2.fit(X_poly, y)
-# Visualising the Linear Regression results
-plt.scatter(X, y, color='blue')
-plt.plot(X, lin.predict(X), color='red')
-plt.title('Linear Regression')
-plt.xlabel('Temperature')
-plt.ylabel('Pressure')
+import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
+import matplotlib.pyplot as plt
+import numpy as np
+
+plt.rcParams['figure.figsize'] = [10, 7.5]
+
+ar1 = np.array([1,0.33])
+ma1 = np.array([1,0.9])
+ARMA_1 = ArmaProcess(ar1,ma1).generate_sample(nsample = 1000)
+plt.plot(ARMA_1)
+plt.title('Simulated ARMA(1,1) Process')
+plt.xlim([0, 200])
 plt.show()
-plt.scatter(X, y, color='blue')
-plt.plot(X, lin2.predict(poly.fit_transform(X)),
- color='red')
-plt.title('Polynomial Regression')
-plt.xlabel('Temperature')
-plt.ylabel('Pressure')
+plot_acf(ARMA_1)
+plot_pacf(ARMA_1)
+ar2 = np.array([1, 0.33, 0.5])
+ma2 = np.array([1, 0.9, 0.3])
+ARMA_2 = ArmaProcess(ar2, ma2).generate_sample(nsample=10000)
+plt.plot(ARMA_2)
+plt.title('Simulated ARMA(2,2) Process')
+plt.xlim([0, 200])
 plt.show()
-# Predicting a new result with Linear Regression
-# after converting predict variable to 2D array
-pred = 110.0
-predarray = np.array([[pred]])
-lin.predict(predarray)
-# Predicting a new result with Polynomial Regression
-# after converting predict variable to 2D array
-pred2 = 110.0
-pred2array = np.array([[pred2]])
-lin2.predict(poly.fit_transform(pred2array))
+plot_acf(ARMA_2)
+plot_pacf(ARMA_2)
+```
+## OUTPUT:
+
+### SIMULATED ARMA(1,1) PROCESS:
+![image](https://github.com/Aashima02/ARIMA-in-Python/assets/93427086/611d4a31-4430-4140-a28d-285324b94a0b)
+
+#### Partial Autocorrelation
+![image](https://github.com/Aashima02/ARIMA-in-Python/assets/93427086/f626ba2a-2ca8-4256-8113-b047b68c81e9)
 
 
-## OUTPUTS
-### A - LINEAR TREND ESTIMATION
-<img width="149" alt="image" src="https://github.com/Monisha-11/POLYNOMIAL-TREND-ESTIMATION/assets/93427240/a7af1bfe-58c9-4c8d-aa59-893718b6c8ce">
+#### Autocorrelation
+![image](https://github.com/Aashima02/ARIMA-in-Python/assets/93427086/83024171-aec3-4f93-8ae0-212fa051d1b0)
 
-### B - POLYNOMIAL REGRESSION
-<img width="281" alt="image" src="https://github.com/Monisha-11/POLYNOMIAL-TREND-ESTIMATION/assets/93427240/f2f93fff-50dc-406d-b9c6-443f57f297f6">
+### SIMULATED ARMA(2,2) PROCESS:
+![image](https://github.com/Aashima02/ARIMA-in-Python/assets/93427086/3b73df8e-b70f-4e86-b105-299ac438ca88)
+
+#### Partial Autocorrelation
+![image](https://github.com/Aashima02/ARIMA-in-Python/assets/93427086/e9fb3ee5-4ee7-43fa-8246-4a842e4ec2c6)
+
+#### Autocorrelation
+![image](https://github.com/Aashima02/ARIMA-in-Python/assets/93427086/2e2f51e6-450a-456a-88ac-7bff4f1dd08c)
+
 
 ## RESULT:
-
-Thus the program run successfully based on the Polynomial Trend Estiamtion model.
+Thus, a python program is created to implement ARMA.
